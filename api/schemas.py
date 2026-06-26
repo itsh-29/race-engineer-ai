@@ -47,3 +47,14 @@ class StrategyResult(BaseModel):
 class OptimizeResponse(BaseModel):
     strategies: List[StrategyResult]
 
+class ExplainRequest(BaseModel):
+    track:str 
+    driver:str
+    strategies:List[StrategyResult]
+
+class ChatRequest(BaseModel):
+    track:str
+    driver:str
+    strategies: List[StrategyResult]
+    message: str
+    

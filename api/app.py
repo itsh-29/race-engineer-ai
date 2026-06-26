@@ -3,10 +3,12 @@ from contextlib import asynccontextmanager
 from core.models.laptime_model import load_model
 from core.models.degradation import degradation_curve,stint_total_time
 from core.optimizer import optimize_strategy
+from api.ai import explain_strategy, chat_with_engineer
 from api.schemas import(
     SimulateRequest,SimulateResponse,CompareRequest,CompareResponse,StintResult,
-    OptimizeRequest,OptimizeResponse
+    OptimizeRequest,OptimizeResponse,ExplainRequest,ChatRequest
 )
+from fastapi.middleware.cors import CORSMiddleware
 
 ml_model={}
 
@@ -17,6 +19,13 @@ async def lifespan(app: FastAPI):
     yield
 
 app = FastAPI(title="RaceEngineerAI",lifespan=lifespan)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5137"],
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
 
 @app.get("/health")
 def health():
@@ -78,4 +87,21 @@ def optimize(req:OptimizeRequest):
         return OptimizeResponse(strategies=strategies)
     except Exception as e :
         raise HTTPException(status_code=500,detail=str(e))
+
+@app.post("/explain")
+def explain(req:ExplainRequest):
+    try:
+        strategies =[s.model_dump() for s in req.strategies]
+        explanation = explain_strategy(req.track,req.driver,strategies)
+        return {"explanation":explanation}
+    except Exception as e :
+        raise HTTPException(status_code=500,detail=str(e))
     
+@app.post("/chat")
+def chat(req:ChatRequest):
+    try:
+        strategies =[s.model_dump() for s in req.strategies]
+        response =chat_with_engineer(req.track,req.driver,strategies,req.message)
+        return {"response":response}
+    except Exception as e :
+        raise HTTPException(status_code=500,detail=str(e))
