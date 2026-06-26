@@ -9,6 +9,12 @@ SESSIONS = [
     (2024, "Monaco", "R"),
     (2024, "Silverstone", "R"),
     (2024, "Monza", "R"),
+    (2023, "Bahrain", "R"),
+    (2023, "Spain", "R"),
+    (2023, "Hungary", "R"),
+    (2024, "Bahrain", "R"),
+    (2024, "Spain", "R"),
+    (2024, "Hungary", "R"),
 ]
 
 CACHE_DIR = ROOT_DIR / "cache"
