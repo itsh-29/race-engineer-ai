@@ -4,6 +4,12 @@ const compoundClass = (compound) => {
   return "compound-hard"
 }
 
+const compoundDot = (compound) => {
+  if (compound === "SOFT") return "soft"
+  if (compound === "MEDIUM") return "medium"
+  return "hard"
+}
+
 const formatTime = (seconds) => {
   const mins = Math.floor(seconds / 60)
   const secs = (seconds % 60).toFixed(1)
@@ -18,19 +24,22 @@ export default function StrategyResults({ strategies, selected, onSelect }) {
         {strategies.map((s) => (
           <div
             key={s.rank}
-            className={`strategy-card ${selected?.rank === s.rank ? "active" : ""}`}
+            className={`strategy-card ${selected?.rank === s.rank ? "active" : ""} ${s.rank === 1 ? "optimal" : ""}`}
             onClick={() => onSelect(s)}
           >
+            {s.rank === 1 && <div className="optimal-badge">Optimal</div>}
+
             <div className="strategy-rank">#{s.rank}</div>
 
             <div className="strategy-stints">
               {s.stints.map((stint, i) => (
-                <span key={i}>
+                <span key={i} style={{ display: "flex", alignItems: "center" }}>
+                  <span className={`compound-dot ${compoundDot(stint.compound)}`}></span>
                   <span className={compoundClass(stint.compound)}>
                     {stint.compound}
                   </span>
-                  <span style={{ color: "#555", fontSize: "12px" }}>
-                    {" "}({stint.laps}L)
+                  <span style={{ color: "#444", fontSize: "11px", marginLeft: "3px" }}>
+                    ({stint.laps}L)
                   </span>
                   {i < s.stints.length - 1 && (
                     <span className="strategy-arrow"> → </span>

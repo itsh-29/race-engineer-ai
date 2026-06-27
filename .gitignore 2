@@ -1,0 +1,18 @@
+# Python virtual environment
+venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# macOS system files
+.DS_Store
+
+# FastF1 cache
+cache/
+
+# local datasets
+data/
+
+# notebook checkpoints
+.ipynb_checkpoints/

@@ -15,12 +15,18 @@ export default function AIEngineer({ explanation, loadingAI, chatMessages, onCha
 
   return (
     <div className="card section">
-      <p className="card-title">AI Race Engineer</p>
+      <div className="ai-header">
+        <div className="ai-avatar">🏎️</div>
+        <div>
+          <div className="ai-title">AI Race Engineer</div>
+          <div className="ai-subtitle">Powered by Gemini 2.5 Flash</div>
+        </div>
+      </div>
 
       {loadingAI ? (
         <div className="loading">
           <div className="spinner"></div>
-          Briefing in progress...
+          Analysing strategy and preparing briefing...
         </div>
       ) : (
         explanation && (
@@ -31,7 +37,10 @@ export default function AIEngineer({ explanation, loadingAI, chatMessages, onCha
       {chatMessages.length > 0 && (
         <div className="chat-messages">
           {chatMessages.map((msg, i) => (
-            <div key={i} className={`chat-message ${msg.role === "user" ? "user" : "ai"}`}>
+            <div
+              key={i}
+              className={`chat-message ${msg.role === "user" ? "user" : "ai"}`}
+            >
               {msg.text}
             </div>
           ))}
@@ -39,18 +48,21 @@ export default function AIEngineer({ explanation, loadingAI, chatMessages, onCha
       )}
 
       {explanation && (
-        <div className="chat-input-row">
-          <input
-            type="text"
-            placeholder="Ask your race engineer anything..."
-            value={input}
-            onChange={e => setInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-          />
-          <button className="btn-primary" onClick={handleSend}>
-            Send
-          </button>
-        </div>
+        <>
+          <div className="divider"></div>
+          <div className="chat-input-row">
+            <input
+              type="text"
+              placeholder="Ask your race engineer anything..."
+              value={input}
+              onChange={e => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+            />
+            <button className="btn-primary" onClick={handleSend}>
+              Send
+            </button>
+          </div>
+        </>
       )}
     </div>
   )
