@@ -23,7 +23,7 @@ export default function StrategyForm({
 
                 <div className="form-group">
                     <label>Driver</label>
-                    <select value={track} onChange={e=>setDriver(e.target.value)}>
+                    <select value={driver} onChange={e=>setDriver(e.target.value)}>
                         {DRIVERS.map(t=> <option key={t}>{t}</option>)}
                     </select>
                 </div>
