@@ -31,6 +31,8 @@ data/*.feather
 # ML Models
 # =========================
 models_store/
+!models_store/laptime_model.joblib
+!models_store/metrics.json
 *.joblib
 *.pkl
 *.h5

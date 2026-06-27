@@ -6,7 +6,7 @@ from core.config import CACHE_DIR,RAW_LAPS_PATH,SESSIONS
 fastf1.Cache.enable_cache(str(CACHE_DIR))
 
 def fetch_session_laps(year,track,session_type):
-    print(f"Loading {year}{track}({session_type})...")
+    print(f"Loading:{year} - {track} ({session_type})...")
     session = fastf1.get_session(year,track,session_type)
     session.load()
 
