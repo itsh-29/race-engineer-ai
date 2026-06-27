@@ -2,7 +2,7 @@ fastapi==0.138.1
 fastf1==3.8.3
 joblib==1.5.3
 numpy==2.5.0
-pandas==3.0.3
+pandas==2.3.3
 protobuf==7.35.1
 pydantic==2.13.4
 python-dotenv==1.2.2
