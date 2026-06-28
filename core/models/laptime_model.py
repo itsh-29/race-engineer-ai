@@ -69,7 +69,7 @@ def load_model():
         raise FileNotFoundError("No Trained model found.Run scripts/train.py first.")
     return joblib.load(MODEL_PATH)
 
-def predict_lap_time(pipeline,track,driver,compound,lap_number,tyre_life,stint=1):
+def predict_lap_time(pipeline,track,driver,compound,lap_number,tyre_life,stint=1,track_base_lap_time=None):
     row = pd.DataFrame([{
         "Track": track,
         "Driver": driver,
@@ -77,5 +77,6 @@ def predict_lap_time(pipeline,track,driver,compound,lap_number,tyre_life,stint=1
         "LapNumber":lap_number,
         "TyreLife": tyre_life,
         "Stint":stint,
+         "TrackBaseLapTime": track_base_lap_time if track_base_lap_time else 90.0,
     }]) 
     return float(pipeline.predict(row)[0])
