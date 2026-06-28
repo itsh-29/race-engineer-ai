@@ -8,6 +8,8 @@ def main(refresh):
     print("RaceEngineerAI-Training Pipeline")
     print("="*50)
     features = get_features(force_refresh=refresh)
+    print(features["Track"].unique())
+    print(features["RaceId"].nunique())
     print(f"\nDataset:{len(features)} laps,{features['RaceId'].nunique()} races")
    
     print("\n---Cross Validation---")
