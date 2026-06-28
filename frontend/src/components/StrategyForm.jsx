@@ -1,5 +1,17 @@
-const TRACKS = ["Monaco","Silverstone","Monza","Spain","Hungary","Bahrain"]
-const DRIVERS= ["VER","HAM","LEC","NOR","SAI","RUS","ALO","PIA"]
+const TRACKS = [
+  "Bahrain", "Saudi Arabia", "Australia", "Japan", "China",
+  "Miami", "Monaco", "Canada", "Spain", "Austria",
+  "Silverstone", "Hungary", "Belgium", "Netherlands", "Monza",
+  "Azerbaijan", "Singapore", "Austin", "Mexico City", "São Paulo",
+  "Las Vegas", "Qatar", "Abu Dhabi"
+]
+
+const DRIVERS = [
+  "VER", "NOR", "LEC", "PIA", "SAI",
+  "RUS", "HAM", "ANT", "ALO", "STR",
+  "GAS", "OCO", "TSU", "LAW", "HUL",
+  "BEA", "BOT", "ZHO", "MAG", "PER"
+]
 
 export default function StrategyForm({
     track,setTrack,
