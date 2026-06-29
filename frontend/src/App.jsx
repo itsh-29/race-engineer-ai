@@ -1,6 +1,6 @@
-import { useState } from "react"
+import { useRef, useState } from "react"
 import "./App.css"
-import { optimizeStrategy, simulateStint, explainStrategy, chatWithEngineer } from "./api/client"
+import { optimizeStrategy,pollStatus, getResults, simulateStint, explainStrategy, chatWithEngineer } from "./api/client"
 
 import Header from "./components/Header"
 import StrategyForm from "./components/StrategyForm"
@@ -26,6 +26,9 @@ export default function App() {
   const [loadingOptimize, setLoadingOptimize] = useState(false)
   const [loadingChart, setLoadingChart] = useState(false)
   const [loadingAI, setLoadingAI] = useState(false)
+  const [optimizeStatus,setOptimizeStatus]= useState("")
+
+  const pollRef = useRef(null)
 
   // ── Step 1: Optimize ──
   const handleOptimize = async () => {
@@ -35,6 +38,7 @@ export default function App() {
     setLapTimes([])
     setExplanation("")
     setChatMessages([])
+    setOptimizeStatus("Submitting race configuration...")
 
     try {
       const res = await optimizeStrategy({
@@ -42,13 +46,41 @@ export default function App() {
         race_laps: raceLaps,
         pit_stop_penalty: pitPenalty
       })
-      setStrategies(res.data.strategies)
-      handleSelectStrategy(res.data.strategies[0], res.data.strategies)
-    } catch (e) {
-      console.error(e)
-    } finally {
-      setLoadingOptimize(false)
-    }
+      const jobId = res.data.job_id
+      setOptimizeStatus("Optimizing race startegy...")
+
+      pollRef.current = setInterval(async ()=>{
+        try{
+           const statusRes = await pollStatus(jobId)
+           const status = statusRes.data.status
+
+           if(status ==="done"){
+            clearInterval(pollRef.current)
+            setOptimizeStatus("Loading results...")
+            const resultRes = await getResults(jobId)
+            const strats = resultRes.data.strategies
+            setStrategies(strats)
+            setLoadingOptimize(false)
+            setOptimizeStatus("")
+            handleSelectStrategy(strats[0],strats)            
+           }else if(status ==="error"){
+            clearInterval(pollRef.current)
+            setLoadingOptimize(false)
+            setOptimizeStatus("Optimization Failed.Please try again")
+           }
+        }catch(e){
+          clearInterval(pollRef.current)
+          setLoadingOptimize(false)
+          setOptimizeStatus("Something went wrong.")
+          }       
+        },2000)
+
+      } catch(e){
+        setLoadingOptimize(false)
+        setOptimizeStatus("Falied to submit job.")
+        console.error(e)
+      }
+  
   }
 
   // ── Step 2: Select a strategy → load chart + AI ──
@@ -117,6 +149,7 @@ export default function App() {
         pitPenalty={pitPenalty} setPitPenalty={setPitPenalty}
         onOptimize={handleOptimize}
         loading={loadingOptimize}
+        status={optimizeStatus}
       />
 
       {strategies.length > 0 && (

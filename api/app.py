@@ -1,5 +1,7 @@
-from fastapi import FastAPI,HTTPException
+from fastapi import FastAPI,HTTPException,BackgroundTasks
 from contextlib import asynccontextmanager
+import uuid
+from concurrent.futures import ThreadPoolExecutor
 from core.models.laptime_model import load_model
 from core.models.degradation import degradation_curve,stint_total_time
 from core.optimizer import optimize_strategy
@@ -11,6 +13,8 @@ from api.schemas import(
 from fastapi.middleware.cors import CORSMiddleware
 
 ml_model={}
+jobs ={}
+executor = ThreadPoolExecutor(max_workers=2)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -77,20 +81,40 @@ def compare(req:CompareRequest):
     except Exception as e:
         raise HTTPException(status_code=500,detail=str(e))
     
-@app.post("/optimize",response_model=OptimizeResponse)
-def optimize(req:OptimizeRequest):
+@app.post("/optimize")
+def optimize(req:OptimizeRequest,background_tasks:BackgroundTasks):
+    job_id = str(uuid.uuid4())
+    jobs[job_id]={"status":"running","result":None}
+    background_tasks.add_task(run_optimize,job_id,req)
+    return {"job_id":job_id}
+
+def run_optimize(job_id:str,req:OptimizeRequest):
     try:
-        pipeline =ml_model["pipeline"]
-        strategies= optimize_strategy(
+        pipeline= ml_model["pipeline"]
+        strategies = optimize_strategy(
             pipeline,
             track=req.track,
-            driver =req.driver,
+            driver=req.driver,
             race_laps=req.race_laps,
             pit_stop_penalty=req.pit_stop_penalty
         )
-        return OptimizeResponse(strategies=strategies)
+        jobs[job_id] = {"status":"done","result":strategies}
     except Exception as e :
-        raise HTTPException(status_code=500,detail=str(e))
+        jobs[job_id] ={"status":"error","result":str(e)}
+
+@app.get("/status/{job_id}")
+def get_status(job_id:str):
+    if job_id not in jobs:
+        raise HTTPException(status_code=404,detail="Job Not Found")
+    return {"status":jobs[job_id]["status"]}
+
+@app.get("/results/{job_id}")
+def get_results(job_id:str):
+    if job_id not in jobs:
+        raise HTTPException(status_code=404,detail="Job Not Found")
+    if jobs[job_id]["status"] != "done":
+        raise HTTPException(status_code=400,detail="Job Not Ready")
+    return OptimizeResponse(strategies=jobs[job_id]["result"])
 
 @app.post("/explain")
 def explain(req:ExplainRequest):

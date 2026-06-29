@@ -19,7 +19,8 @@ export default function StrategyForm({
     raceLaps,setRaceLaps,
     pitPenalty,setPitPenalty,
     onOptimize,
-    loading
+    loading,
+    status
 }){
     return(
         <div className="card section">
@@ -60,6 +61,12 @@ export default function StrategyForm({
                     />
                 </div>
             </div>
+            {status && (
+                <div className="loading" style={{ marginBottom: "12px" }}>
+                    <div className="spinner"></div>
+                    {status}
+                </div>
+                )}
             <button 
                 className="btn-primary"
                 onClick={onOptimize}
